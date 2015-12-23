@@ -1,0 +1,2 @@
+$('#all-dicoms').replaceWith("<%= escape_javascript render 'basic_infos/dicoms', :user=>@user %>");
+$(".dicom-qrcode").colorbox({href : $(this).attr('href')});

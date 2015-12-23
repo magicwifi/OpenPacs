@@ -1,0 +1,91 @@
+<link rel="stylesheet" href="/jq/css/jquery.fileupload.css">
+<div id="user-show" class="container clearfix">
+  <div id="user-course" >
+    <ul class="main-nav">
+      <li class="active" data-course-type="owned">
+        <a href="#owned-courses">我的影像</a>
+      </li>
+    </ul>
+
+    <div class="content owned-courses-section active clearfix">
+            <%= render "dicoms", :user=>@user %>
+<p style="height:50px;"></p>
+    <br>
+    <!-- The fileinput-button span is used to style the file input field as button -->
+    <span class="btn btn-success fileinput-button">
+        <i class="glyphicon glyphicon-plus"></i>
+        <span id="filesadd">添加影像文件</span>
+        <!-- The file input field used as target for the file upload widget -->
+        <input id="fileupload" type="file" name="files[]" multiple>
+    </span>
+    <br>
+    <br>
+    <!-- The global progress bar -->
+    <div id="progress" class="progress">
+        <div class="progress-bar progress-bar-success"></div>
+    </div>
+    <!-- The container for the uploaded files -->
+    <div id="files" class="files"></div>
+    <br>
+    </div>
+</div><!-- user-show -->
+</div><!-- user-show -->
+<% content_for :template_js do %>
+  <script>
+
+$(function () {
+    'use strict';
+    var url = 'http://117.34.78.199/orthanc/instances/', 
+        uploadButton = $('<button/>')
+            .addClass('btn btn-primary')
+            .text('Upload')
+            .on('click', function () {
+                var $this = $(this),
+                    data = $this.data();
+                $this
+                    .off('click')
+                    .text('Abort')
+                    .on('click', function () {
+                        $this.remove();
+                        data.abort();
+                    });
+                data.submit().always(function () {
+                    $this.remove();
+                });
+            });
+    $('#fileupload').fileupload({
+        url: url,
+        dataType: 'json',
+        autoUpload: false
+    }).on('fileuploadadd', function (e, data) {
+        data.context = $('<div/>').appendTo('#files');
+        $.each(data.files, function (index, file) {
+            var node = $('<p/>')
+                    .append($('<span/>').text(file.name));
+            if (!index) {
+                node
+                    .append('<br>')
+                    .append(uploadButton.clone(true).data(data));
+            }
+            node.appendTo(data.context);
+        });
+    }).on('fileuploadprogressall', function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#progress .progress-bar').css(
+            'width',
+            progress + '%'
+        );
+    }).on('fileuploaddone', function (e, data) {
+		$('#filesadd').text('继续添加影像');
+		if(data.result.Status ==='Success'){
+			$.post( "/dicoms", data.result);
+		}
+        }).prop('disabled', !$.support.fileInput)
+      
+  .parent().addClass($.support.fileInput ? undefined : 'disabled');
+});
+
+
+
+</script>
+<% end %>

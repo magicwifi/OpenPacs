@@ -1,4 +1,4 @@
-source 'http://ruby.taobao.org'
+source 'https://ruby.taobao.org'
 
 gem 'rails', '4.1.6'
 gem 'kss'
@@ -54,3 +54,5 @@ gem 'protected_attributes'
 gem 'qiniu', '~> 6.4.1'
 gem 'momentjs-rails'
 gem 'pikaday-gem', '~> 1.2.0'
+gem 'httparty'
+gem 'rqrcode_png'  

@@ -1,0 +1,29 @@
+<div id="all-dicoms" >
+<table class="table table-bordered" style="width: 900px;">
+<thead>
+<tr>
+<th style="width: 470px;">名称</th>
+<th>生成时间</th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<% user.dicoms.each do |dicom| %>
+<tr>
+<td><%= dicom.name %></td>
+<td><%= dicom.instance_create %></td>
+<td><%= link_to 'PC端', '/orthanc/web-viewer/app/viewer.html?series='+dicom.pc_url %></td>
+<td><%= link_to '分享', dicom, :remote=>true,:class=>"dicom-qrcode" %></td>
+<td><%= link_to '删除', dicom, :method=>"delete",:remote=>true  %></td>
+</tr>
+<% end %>
+</tbody>
+</table>
+</div>
+<% content_for :template_js do %>
+  <script>
+	$(".dicom-qrcode").colorbox({href : $(this).attr('href')});
+</script>
+<% end %>

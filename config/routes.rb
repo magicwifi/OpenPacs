@@ -39,6 +39,8 @@ Onestep::Application.routes.draw do
   resources :operations
   resources :password_resets
   resources :doctors
+  resources :dicoms
+  get "/dicomupload" => "basic_infos#dicomupload"
   get "/doctor_index" => "doctors#doctor_index"
   get "/doctors/commit/:id/" => "doctors#doctor_commit", :as=>"doctor_commit"
   post "/:basic_case_id/:doctor_id/create_reply" => "replies#create"
@@ -123,6 +125,7 @@ Onestep::Application.routes.draw do
   get "/showmyinfo" => "basic_infos#edit"
   get "/editmysick" => "basic_infos#edit_sick"
   get "/editmyoper" => "basic_infos#edit_oper"
+  get "/editmydicom" => "basic_infos#edit_dicom"
   get "/editmyhist" => "basic_infos#edit_hist"
   #get "/edited_all_case" => "basic_infos#edited_all_case"
   #get "/change_all_case" => "basic_infos#change_all_case"

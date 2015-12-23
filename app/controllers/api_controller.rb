@@ -1,3 +1,6 @@
+# encoding: utf-8
+require 'httparty'
+
 class ApiController < ApplicationController
 skip_before_action :verify_authenticity_token
 
@@ -7,6 +10,36 @@ skip_before_action :verify_authenticity_token
       format.html {render text: "Error#{code.to_s}-#{msg}"}
       format.json {render :json => {:status => {:code=>code.to_s, :message=>msg}}}
     end
+  end
+
+  def dicom
+	path = 'http://117.34.78.199/orthanc'+params[:Path]
+	response = HTTParty.get(path)
+	pc_url = response["ParentSeries"]
+	@user = current_user
+    	respond_to do |f|
+      	f.js do
+	if !pc_url.nil? 
+		user_id = current_user.id
+		Dicom.create!(:name=>params[:ID],:pc_url=>pc_url,:mobile=>params[:Path],:instance_create=>response["MainDicomTags"]["InstanceCreationDate"],:user_id=>user_id   )
+	
+	end
+      	end
+    	end
+  end
+
+  def delete
+	path = 'http://117.34.78.199/orthanc/instances/'+params[:name]
+	response = HTTParty.delete(path)
+	if !response.nil? 
+		dicom = Dicom.find_by_name(params[:name])
+		dicom.destroy
+	end
+    	respond_to do |f|
+      	f.js do
+	@user = current_user
+	end
+      	end
   end
 
   def money

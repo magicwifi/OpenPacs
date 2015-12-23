@@ -7,6 +7,24 @@ class BasicInfosController < ApplicationController
     @basic_info = @user.basic_info
   end
 
+  def dicomupload
+	render layout: false
+  end
+
+  def dicom
+	path = '/orthanc'+params[:Path]
+	response = HTTParty.get(path)
+	pc_url = response[:ParentSeries]
+	if !pc_url.nil? 
+		user_id = current_user.id
+		Dicom.create!( :pc_url=>pc_url,:mobile_url=>path,:instance_create=>response[:InstanceCreationDate],:user_id=>user_id   )
+		render :text=>'dicom success'
+	else
+		render :text=>'dicom fail'
+	
+	end
+  end
+
   def asked 
      @user = current_user
      basic_cases = @user.basic_cases;
@@ -316,6 +334,11 @@ class BasicInfosController < ApplicationController
   end
   
   def edit_oper
+    @user = current_user
+    session[:return_to] = request.url
+  end
+
+  def edit_dicom
     @user = current_user
     session[:return_to] = request.url
   end
