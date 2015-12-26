@@ -1,9 +1,11 @@
-$('.flash-message').get(0).innerHTML='手术更新成功!';
-$('.info-message').get(0).innerHTML='保存成功!';
-$('.playlist-container').replaceWith("<%= escape_javascript render 'basic_infos/all_added_operations', :user=>@user %>");
+$('.playlist-container').replaceWith("<%= escape_javascript render 'basic_infos/all_added_operations', :user=>@user, :operations=>@operations %>");
+$('.add-video-box').replaceWith("<%= escape_javascript render 'basic_infos/edit_operation', :operation => @operation %>");
 $('.playlist li a.video').removeClass('active');
 $('.playlist li').removeClass('selected');
 $('.playlist li a.video').eq(<%= @operation.position - 1 %>).addClass('active');
 $('.playlist li').eq(<%= @operation.position - 1 %>).addClass('selected');
+$('.info-message').get(0).innerHTML='保存成功!';
+$('input#submit_operation_info').removeAttr('disabled');
+$('input#submit_operation_info').get(0).setAttribute('value', '保存手术/外伤信息');
 
 

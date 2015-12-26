@@ -7,8 +7,9 @@ $(document).ready(function() {
     createVideoForm.QiniuUploader({
       autoUpload: true,
       removeProgressBarWhenCompleted: true,
+	allowMultipleFiles: true,
       onFilesAdd: function(file) {
-        types = /(\.|\/)(doc|docx|mov|mp4|jpg|png)$/i;
+        types = /(\.|\/)(doc|docx|mov|mp4|jpg|jpeg|png)$/i;
         if (types.test(file.type) || types.test(file.name)) {
           if (file.size > 100000000) {
             alert("上传失败：" + file.name + " 附件太大，超过100M");

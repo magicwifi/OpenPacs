@@ -1,4 +1,4 @@
-$('.add-video-box').replaceWith("<%= escape_javascript render 'add_operation', :user => @user %>");
+$('.add-video-box').replaceWith("<%= escape_javascript render 'add_operation', :operation => @operation %>");
 $('.playlist li').removeClass('selected');
 $('.playlist li a.video').removeClass('active');
 $('.add-video-btn a.video').addClass('active');
@@ -26,17 +26,49 @@ $(document).ready(function(){
 
 });
 $('input#submit_operation_info').click(function(){
-         $('form#new_operation').submit();
+	$('form.edit_operation').submit();
 });
-$('#video-title').on('change', function() {
-	var value = $('#video-title').val();
-	 $('#x\\:title').attr('value', value);
+$(function () {
+    'use strict';
+    var url = 'http://117.34.78.199/orthanc/instances/', 
+        uploadButton = $('<button/>')
+            .addClass('btn btn-primary')
+            .text('Upload')
+            .on('click', function () {
+                var $this = $(this),
+                    data = $this.data();
+                $this
+                    .off('click')
+                    .text('Abort')
+                    .on('click', function () {
+                        $this.remove();
+                        data.abort();
+                    });
+                data.submit().always(function () {
+                    $this.remove();
+                });
+            });
+    $('#fileupload').fileupload({
+        url: url,
+        dataType: 'json',
+        autoUpload: true,
+      removeProgressBarWhenCompleted: true
+    }).on('fileuploadprogressall', function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#progress .progress-bar').css(
+            'width',
+            progress + '%'
+        );
+    }).on('fileuploaddone', function (e, data) {
+		$('#filesadd').text('继续添加影像');
+        	$('.progress-bar').text('上传成功');
+		data.result.operation_id = <%= @operation.id %>;
+		console.log(data.result);
+		if(data.result.Status ==='Success' || data.result.Status ==='AlreadyStored'){
+			$.post( "/dicom_oper", data.result);
+		}
+        }).prop('disabled', !$.support.fileInput)
+      
+  .parent().addClass($.support.fileInput ? undefined : 'disabled');
 });
-$('#video-desc').on('change', function() {
-	var value = $('#video-desc').val();
-	 $('#x\\:desc').attr('value', value);
-});
-$('#datepicker').on('change', function() {
-	var value = $('#datepicker').val();
-	 $('#x\\:sick_date').attr('value', value);
-});
+

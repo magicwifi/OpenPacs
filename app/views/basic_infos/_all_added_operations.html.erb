@@ -1,6 +1,6 @@
 <div class="playlist-container">
   <ul id="play-list" class="playlist" data-update-url="/sort_operations">
-    <% user.operations.each_with_index do |operation,index| %>
+    <% operations.each_with_index do |operation,index| %>
       <%= content_tag_for :li, operation do %>
         <a class="video" href="<%= @user.name+ '/'+operation.position.to_s + '/editoper.js' %>" data-remote='true'>
           <span class="video-info edit-video-info">

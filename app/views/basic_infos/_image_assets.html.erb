@@ -1,0 +1,5 @@
+<div class="all-assets" >
+<%  operation.image_assets.each do |image_asset|  %>
+<p class="video-filename">&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onClick="window.open('<%= image_asset.asset.nil? ? "#":"http://"+Settings.qiniu.bucket_domain+"/"+image_asset.asset %>','newwindow','height=500,width=611,scrollbars=yes,status=yes,screenX=400,screenY=400')" ><%= image_asset.filename %></a></p>
+<%  end  %>
+</div>

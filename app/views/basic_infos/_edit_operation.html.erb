@@ -1,13 +1,13 @@
 <script>
   jQuery(function($) {
     var updateVideoForm;
-    updateVideoForm = $("form#update-video-uploader");
+    updateVideoForm = $("form#create-video-uploader");
     if (updateVideoForm.length > 0) {
       updateVideoForm.QiniuUploader({
         autoUpload: true,
         removeProgressBarWhenCompleted: true,
         onFilesAdd: function(file) {
-          types = /(\.|\/)(doc|docx|jpg|png|mov|mp4)$/i;
+          types = /(\.|\/)(doc|docx|jpg|jpeg|png|mov|mp4)$/i;
           if (types.test(file.type) || types.test(file.name)) {
             if (file.size > 100000000) {
               alert("上传失败：" + file.name + " 手术信息太大，超过100M");
@@ -20,17 +20,6 @@
             return false;
           }
         }
-      });
-      updateVideoForm.bind("qiniu_upload_start", function(e) {
-        $('#submit_operation_info').attr('value', '手术信息正在上传');
-        $('#submit_operation_info').attr('disabled', 'true');
-        $('a.fileupload-btn').bind('click', false);
-      });
-      updateVideoForm.bind("qiniu_upload_complete", function(e, data) {
-        $('#submit_operation_info').attr('value', '保存手术信息信息');
-        $('#submit_operation_info').removeAttr('disabled');
-        $('#progress-text').html("手术信息上传成功！");
-        $('#video-filename').html("手术信息文件名： " + "<strong>" + data.fname + "</strong>");
       });
     }
   });
@@ -60,6 +49,51 @@ $('input#submit_operation_info1').click(function(){
 });
 
 });
+
+$(function () {
+    'use strict';
+    var url = 'http://117.34.78.199/orthanc/instances/', 
+        uploadButton = $('<button/>')
+            .addClass('btn btn-primary')
+            .text('Upload')
+            .on('click', function () {
+                var $this = $(this),
+                    data = $this.data();
+                $this
+                    .off('click')
+                    .text('Abort')
+                    .on('click', function () {
+                        $this.remove();
+                        data.abort();
+                    });
+                data.submit().always(function () {
+                    $this.remove();
+                });
+            });
+    $('#fileupload').fileupload({
+        url: url,
+        dataType: 'json',
+        autoUpload: true,
+      removeProgressBarWhenCompleted: true
+    }).on('fileuploadprogressall', function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#progress .progress-bar').css(
+            'width',
+            progress + '%'
+        );
+    }).on('fileuploaddone', function (e, data) {
+		$('#filesadd').text('继续添加影像');
+        	$('.progress-bar').text('上传成功');
+		data.result.operation_id = <%= operation.id %>;
+		console.log(data.result);
+		if(data.result.Status ==='Success' || data.result.Status ==='AlreadyStored'){
+			$.post( "/dicom_oper", data.result);
+		}
+        }).prop('disabled', !$.support.fileInput)
+      
+  .parent().addClass($.support.fileInput ? undefined : 'disabled');
+});
+
 </script>
 <div class="add-video-box clearfix">
   <div class="primary-info">
@@ -85,20 +119,23 @@ $('input#submit_operation_info1').click(function(){
           <%= f.text_field  :sick_date, :class =>"supershort", :id=>"datepicker"  %>
           </dd>
         </dl>
+	<p style="height:10px;" ></p>
       <dl class="form">
         <dt><label>更新手术/外伤图像</label></dt>
        <dl>
     <% end %>
   </div>
-  <div class="secondary-info">
-    <p id="video-filename">查看文件: <a href="#" onClick="window.open('<%= operation.asset.nil? ? "#":"http://"+Settings.qiniu.bucket_domain+"/"+operation.asset %>','newwindow','height=500,width=611,scrollbars=yes,status=yes,screenX=400,screenY=400')" ><%= operation.filename %></a></p>
-    <%= qiniu_video_uploader_form callback_url: "/update_operation/#{operation.id}",
-      callback_method: 'PATCH',
+	 <div class="secondary-info" style="height:<%= 300+operation.image_assets.count*5+operation.dicoms.count*35 %>px;" >
+          <%= render "basic_infos/image_assets", :operation => operation %>
+	<p style="height:20px;" ></p>
+    <%= qiniu_video_uploader_form callback_url: image_assets_path,
       bucket:        "#{Settings.qiniu.bucket}",
-      id:            'update-video-uploader',
+      id:            'create-video-uploader',
+      callback_method: 'POST',
+      custom_fields: { operation_id: operation.id },
       progress_bar_id: 'progress-bar' do %>
 
-        <input id="fileupload" name="file" type="file">
+	 <%= file_field_tag :file, multiple: true,  accept: "image/png, image/jpg"   %>
       <div class="bar" id="progress-bar"></div>
     <% end %>
 
@@ -111,6 +148,17 @@ $('input#submit_operation_info1').click(function(){
         </div>
       </div>
     </script>
+<p style="height:20px;" ></p>
+
+<dl class="form">
+        <dt><label >上传本次影像文件(dcm格式)</label></dt>
+      </dl>
+          <%= render "basic_infos/dicom_assets", :operation => operation %>
+	<p style="height:20px;" ></p>
+    <span class="btn1 fileinput-button">
+        <!-- The file input field used as target for the file upload widget -->
+        <input id="fileupload" accept="application/dicom" type="file" name="files[]" multiple>
+    </span>
   <div class="third-info"></div>
       <div class="video-button-group">
 <input class="button primary" data-disable-with="保存中..." id="submit_operation_info1" name="commit" type="submit" value="保存手术/外伤信息">

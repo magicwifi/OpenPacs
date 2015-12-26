@@ -195,6 +195,10 @@ class BasicInfosController < ApplicationController
 
   def add_operation
     @user = current_user
+    @operation = @user.operations.where(:edited=>false).last
+    if @operation.nil?
+    	@operation = Operation.create!(:user_id =>@user.id,:edited=>false)
+    end
     respond_to do |format|
       format.js
     end
@@ -335,6 +339,11 @@ class BasicInfosController < ApplicationController
   
   def edit_oper
     @user = current_user
+    @operation = @user.operations.where(:edited=>false).last
+    if @operation.nil?
+    	@operation = Operation.create!(:user_id =>@user.id,:edited=>false)
+    end
+    @operations = @user.operations.where(:edited=>true)
     session[:return_to] = request.url
   end
 

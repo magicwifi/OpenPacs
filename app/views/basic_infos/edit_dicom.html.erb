@@ -22,10 +22,15 @@
     <br>
     <!-- The global progress bar -->
     <div id="progress" class="progress">
-        <div class="progress-bar progress-bar-success"></div>
+       <span id="progress-text">附件正在上传...</span>
+        <div class="bar" style="width: 0%"></div>
     </div>
+
+
+
     <!-- The container for the uploaded files -->
     <div id="files" class="files"></div>
+
     <br>
     </div>
 </div><!-- user-show -->
@@ -53,32 +58,31 @@ $(function () {
                     $this.remove();
                 });
             });
+    $('#progress').hide();
     $('#fileupload').fileupload({
         url: url,
         dataType: 'json',
-        autoUpload: false
+        autoUpload: true,
+      removeProgressBarWhenCompleted: true
     }).on('fileuploadadd', function (e, data) {
-        data.context = $('<div/>').appendTo('#files');
-        $.each(data.files, function (index, file) {
-            var node = $('<p/>')
-                    .append($('<span/>').text(file.name));
-            if (!index) {
-                node
-                    .append('<br>')
-                    .append(uploadButton.clone(true).data(data));
-            }
-            node.appendTo(data.context);
-        });
+		$('#progress').show();
+        	$('.bar').css('width', '0%');
+        	$('#progress-text').text('附件正在上传...');
     }).on('fileuploadprogressall', function (e, data) {
         var progress = parseInt(data.loaded / data.total * 100, 10);
-        $('#progress .progress-bar').css(
+        $('.bar').css(
             'width',
             progress + '%'
         );
     }).on('fileuploaddone', function (e, data) {
 		$('#filesadd').text('继续添加影像');
-		if(data.result.Status ==='Success'){
+        	$('#progress-text').text('上传成功');
+		if(data.result.Status ==='Success' || data.result.Status ==='AlreadyStored' ){
 			$.post( "/dicoms", data.result);
+			$('#progress').hide();
+        		$('.bar').css('width', '0%');
+        		$('#progress-text').text('附件正在上传...');
+			
 		}
         }).prop('disabled', !$.support.fileInput)
       

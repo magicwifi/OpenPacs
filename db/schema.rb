@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151221124040) do
+ActiveRecord::Schema.define(version: 20151224132916) do
 
   create_table "activities", force: true do |t|
     t.string   "action"
@@ -132,6 +132,7 @@ ActiveRecord::Schema.define(version: 20151221124040) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "name"
+    t.integer  "operation_id"
   end
 
   create_table "doctors", force: true do |t|
@@ -171,6 +172,16 @@ ActiveRecord::Schema.define(version: 20151221124040) do
     t.datetime "updated_at"
   end
 
+  create_table "image_assets", force: true do |t|
+    t.string   "asset"
+    t.integer  "size"
+    t.string   "filename"
+    t.string   "content_type"
+    t.integer  "operation_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "messages", force: true do |t|
     t.string   "name"
     t.text     "description"
@@ -203,16 +214,12 @@ ActiveRecord::Schema.define(version: 20151221124040) do
     t.text     "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "poster"
     t.boolean  "public"
-    t.float    "price",        limit: 24
-    t.string   "asset"
+    t.float    "price",      limit: 24
     t.integer  "user_id"
-    t.integer  "size"
-    t.string   "filename"
-    t.string   "content_type"
     t.integer  "position"
     t.datetime "sick_date"
+    t.boolean  "edited"
   end
 
   create_table "orders", force: true do |t|

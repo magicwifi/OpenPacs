@@ -1,0 +1,6 @@
+<div class="all-dicoms" >
+<%  operation.dicoms.each do |dicom|  %>
+<p class="video-filename" ><a href="#" onClick="window.open('<%= "/orthanc/web-viewer/app/viewer.html?series="+dicom.pc_url  %>','newwindow','height=500,width=611,scrollbars=yes,status=yes,screenX=400,screenY=400')" ><%= dicom.name  %></a></p>
+<br/>
+<%  end  %>
+</div>

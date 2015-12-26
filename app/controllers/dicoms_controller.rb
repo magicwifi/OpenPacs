@@ -15,20 +15,32 @@ skip_before_action :verify_authenticity_token
       	f.js do
 	if !pc_url.nil? 
 		user_id = current_user.id
-		Dicom.create!(:name=>params[:ID],:pc_url=>pc_url,:mobile=>params[:Path],:instance_create=>response["MainDicomTags"]["InstanceCreationDate"],:user_id=>user_id   )
+		Dicom.create!(:name=>params[:ID],:pc_url=>pc_url,:mobile=>params[:Path],:instance_create=>response["MainDicomTags"]["InstanceCreationDate"],:user_id=>user_id )
 	
 	end
       	end
     	end
-  end
+  end   
+
+  def dicom_oper
+	path = 'http://117.34.78.199/orthanc'+params[:Path]
+	response = HTTParty.get(path)
+	pc_url = response["ParentSeries"]
+	@operation = Operation.find(params[:operation_id])
+    	respond_to do |f|
+      	f.js do
+	if !pc_url.nil? 
+		user_id = current_user.id
+		Dicom.create!(:name=>params[:ID],:pc_url=>pc_url,:mobile=>params[:Path],:instance_create=>response["MainDicomTags"]["InstanceCreationDate"],:user_id=>user_id,:operation_id => params[:operation_id]   )
+	
+	end
+      	end
+    	end
+  end   
 
   def destroy
     	dicom = Dicom.find(params[:id])
-	path = 'http://117.34.78.199/orthanc/instances/'+dicom.name
-	response = HTTParty.delete(path)
-	if !response.nil? 
-		dicom.destroy
-	end
+	dicom.destroy
 	@user = current_user
 	render layout: false
   end

@@ -37,9 +37,11 @@ Onestep::Application.routes.draw do
   resources :sick_assets
   resources :sicknesses
   resources :operations
+  resources :image_assets
   resources :password_resets
   resources :doctors
   resources :dicoms
+  post "/dicom_oper" => "dicoms#dicom_oper"
   get "/dicomupload" => "basic_infos#dicomupload"
   get "/doctor_index" => "doctors#doctor_index"
   get "/doctors/commit/:id/" => "doctors#doctor_commit", :as=>"doctor_commit"
